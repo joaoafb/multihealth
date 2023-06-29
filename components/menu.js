@@ -1,5 +1,61 @@
-function menupem0() {
+document.addEventListener("DOMContentLoaded", function() {
 
+    firebase.firestore().collection("admin").where("senha", "==", localStorage.getItem("pass"))
+        .get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const pem = doc.data().pem;
+
+
+                if (pem == 0) {
+                    menupem0();
+                } else if (pem == 1) {
+                    menupem1();
+                } else if (pem == 2) {
+                    menupem2();
+                } else if (pem == 3) {
+                    menupem3();
+                } else if (pem == 4) {
+                    menupem4();
+                }
+
+            });
+        })
+        .catch((error) => {
+            console.log("Error getting documents: ", error);
+        });
+
+});
+
+function menupem0() {
+    var db = firebase.firestore();
+    var dessensibilizarCollection = db.collection("dessensibilizar");
+
+    // Filtrar os documentos com status igual a 'pendente'
+    var queryPendente = dessensibilizarCollection.where("status", "==", "pendente");
+
+    queryPendente.onSnapshot(function(querySnapshot) {
+        var quantidadePendente = querySnapshot.size;
+
+        localStorage.setItem("dessenspendente", quantidadePendente)
+
+    });
+
+
+    db.collection("dessensibilizar").where("status", "==", "Envio Pendente").onSnapshot(function(querySnapshot) {
+        querySnapshot.size
+
+        localStorage.setItem("dessensenviopendente", querySnapshot.size)
+
+    });
+
+
+    db.collection("dessensibilizar").where("status", "==", "Receita Enviada").onSnapshot(function(querySnapshot) {
+        querySnapshot.size
+
+        localStorage.setItem("dessensreceitaenviada", querySnapshot.size)
+
+    });
     var db = firebase.firestore();
     var chamadosCollection = db.collection("chamados");
 
@@ -50,7 +106,34 @@ function menupem0() {
 }
 
 function menupem1() {
+    var db = firebase.firestore();
+    var dessensibilizarCollection = db.collection("dessensibilizar");
 
+    // Filtrar os documentos com status igual a 'pendente'
+    var queryPendente = dessensibilizarCollection.where("status", "==", "pendente");
+
+    queryPendente.onSnapshot(function(querySnapshot) {
+        var quantidadePendente = querySnapshot.size;
+
+        localStorage.setItem("dessenspendente", quantidadePendente)
+
+    });
+
+
+    db.collection("dessensibilizar").where("status", "==", "Envio Pendente").onSnapshot(function(querySnapshot) {
+        querySnapshot.size
+
+        localStorage.setItem("dessensenviopendente", querySnapshot.size)
+
+    });
+
+
+    db.collection("dessensibilizar").where("status", "==", "Receita Enviada").onSnapshot(function(querySnapshot) {
+        querySnapshot.size
+
+        localStorage.setItem("dessensreceitaenviada", querySnapshot.size)
+
+    });
 
     var db = firebase.firestore();
     var dessensibilizarCollection = db.collection("dessensibilizar");
@@ -104,9 +187,26 @@ function menupem2() {
     queryPendente.onSnapshot(function(querySnapshot) {
         var quantidadePendente = querySnapshot.size;
         document.querySelector("#criarreceita").innerHTML = quantidadePendente;
-
+        localStorage.setItem("dessenspendente", quantidadePendente)
         exibirNotificacao("MultiHealth | Olá, " + localStorage.getItem("usuario"), "Você recebeu um novo paciente!");
     });
+
+
+    db.collection("dessensibilizar").where("status", "==", "Envio Pendente").onSnapshot(function(querySnapshot) {
+        querySnapshot.size
+
+        localStorage.setItem("dessensenviopendente", querySnapshot.size)
+
+    });
+
+
+    db.collection("dessensibilizar").where("status", "==", "Receita Enviada").onSnapshot(function(querySnapshot) {
+        querySnapshot.size
+
+        localStorage.setItem("dessensreceitaenviada", querySnapshot.size)
+
+    });
+
 
 
 
@@ -332,6 +432,42 @@ customElements.define('sub-menu-admin', SUBMENUADMIN);
 
 
 
+class SUBMENUAUT
+extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    connectedCallback() {
+        this.innerHTML = `
+        <!--MENU LATERAL-->
+    <div  id="homeautorizacao"  style="display:none">
+        <div class="menupage">
+       
+            <ul style="overflow-y: scroll;">
+                <div onclick="optionaut()" class="optionaut">
+                    <li>Autorizações</li>
+                </div>
+                <div onclick="optionconv()" class="optionconv">
+                    <li>Convênios</li>
+                </div>
+             
+                
+              
+             
+              
+            </ul>
+            <div class="headermenu">
+            <button class="button notific btnmenu zoom" onclick="back()"><i class="lni lni-shift-left"></i></button>
+        </div>
+        </div>
+        <!--FIM MENU LATERAL-->
+      `;
+    }
+}
+
+// Registrar o elemento personalizado
+customElements.define('sub-menu-aut', SUBMENUAUT);
 
 
 
@@ -359,12 +495,16 @@ function admin() {
 }
 
 function autorizacao() {
-    toast("Módulo Disponível Em Breve...", 2000)
+    $(".menuinicial").hide();
+    $("#homeadmin").hide();
+    $("#homeautorizacao").show();
+    $("#menuop, #menuenfer").hide();
 
 }
 
 function back() {
     $("#homeop, #homeadmin, #homeenfer").hide();
+    $("#homeautorizacao").hide();
     $(".menuinicial").show();
     $(".content").hide()
 
@@ -379,36 +519,3 @@ function back() {
     $(".optionPem").removeClass("active");
     $(".optionLogs").removeClass("active");
 }
-
-
-function exibirNotificacao(titulo, descricao) {
-    // Verificar se o navegador suporta notificações
-    if (!("Notification" in window)) {
-        console.log("Este navegador não suporta notificações.");
-        return;
-    }
-
-    // Verificar se as permissões de notificação foram concedidas
-    if (Notification.permission === "granted") {
-        // Criar a notificação
-        var options = {
-            body: descricao,
-            icon: '../client/imgs/logoredondo.png'
-        };
-        var notification = new Notification(titulo, options);
-    } else if (Notification.permission !== "denied") {
-        // Solicitar permissão ao usuário
-        Notification.requestPermission(function(permission) {
-            if (permission === "granted") {
-                // Criar a notificação
-                var options = {
-                    body: descricao,
-                    icon: '../client/imgs/logoredondo.png'
-                };
-                var notification = new Notification(titulo, options);
-            }
-        });
-    }
-}
-
-// Exemplo de uso

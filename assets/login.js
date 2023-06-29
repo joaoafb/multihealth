@@ -12,7 +12,7 @@ function fazerLogin(event) {
         .then(function(userCredential) {
             // Login bem-sucedido, redirecionar para a próxima página ou executar outras ações
             console.log('Login bem-sucedido!');
-            location.href = '../client/index.html'
+            location.href = './index.html'
         })
         .catch(function(error) {
             // Tratar erros de login
@@ -38,7 +38,7 @@ function signInWithGoogle() {
         .then(function(result) {
             // Sucesso no login, você pode acessar os detalhes do usuário result.user
             console.log('Usuário logado:', result.user);
-            location.href = '../client/index.html'
+            location.href = './index.html'
         })
         .catch(function(error) {
             // Ocorreu um erro durante o login
